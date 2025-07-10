@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """
-This module uses this REST API(https://jsonplaceholder.typicode.com/)to get data for a given employee ID, returns information about his/her TODO list progress.
+This module uses this REST API(https://jsonplaceholder.typicode.com/)to get
+data for a given employee ID, returns
+information about his/her TODO list progress
 """
 
 import requests
