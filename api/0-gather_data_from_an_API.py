@@ -1,34 +1,52 @@
 #!/usr/bin/python3
-"""
-This module uses this REST API(https://jsonplaceholder.typicode.com/)to get
-data for a given employee ID, returns
-information about his/her TODO list progress
-"""
+"""Fetches and displays TODO list progress for a given employee ID."""
 
 import requests
 import sys
 
+
+def main():
+    """Main function to fetch and display TODO progress."""
+    if len(sys.argv) != 2:
+        print("Usage: ./0-gather_data_from_an_API.py <employee_id>")
+        sys.exit(1)
+
+    try:
+        employee_id = int(sys.argv[1])
+    except ValueError:
+        print("Employee ID must be an integer.")
+        sys.exit(1)
+
+    url_user = (
+        "https://jsonplaceholder.typicode.com/users/{}".format(
+            employee_id
+        )
+    )
+    response_user = requests.get(url_user)
+    user = response_user.json()
+    employee_name = user.get("name")
+
+    url_todos = (
+        "https://jsonplaceholder.typicode.com/todos?userId={}".format(
+            employee_id
+        )
+    )
+    response_todos = requests.get(url_todos)
+    todos = response_todos.json()
+
+    done_tasks = [task for task in todos if task.get("completed")]
+    total_tasks = len(todos)
+    done_count = len(done_tasks)
+
+    print(
+        "Employee {} is done with tasks({}/{}):".format(
+            employee_name, done_count, total_tasks
+        )
+    )
+
+    for task in done_tasks:
+        print("\t {}".format(task.get("title")))
+
+
 if __name__ == "__main__":
-    empl_ID = sys.argv[1]
-
-    # TODO and User endpoints for getting data
-    todo_url = f"https://jsonplaceholder.typicode.com/todos?userId={empl_ID}"
-    user_url = f"https://jsonplaceholder.typicode.com/users/{empl_ID}"
-
-    # Fetch data for employee name
-    user_response = requests.get(user_url)
-    userjson = user_response.json()
-    empl_name = userjson.get("name")
-
-    # Fetch employee TODO list
-    todo_response = requests.get(todo_url)
-    tdjson = todo_response.json()
-
-    # Count completed and total tasks for employee
-    completed_tasks = [i for i in tdjson if i.get("completed")]
-    total_tasks = len(tdjson)
-
-    print(f"Employee {empl_name} is done with tasks({len(completed_tasks)}/{total_tasks}):")
-
-    for i in completed_tasks:
-        print(f"\t {i.get('title')}")
+    main()
